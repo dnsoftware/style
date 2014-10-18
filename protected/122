@@ -1,0 +1,8 @@
+
+Yii Migration Tool v1.0 (based on Yii v1.1.15)
+
+Total 2 new migrations to be applied:
+    m110805_153437_installYiiUser
+    m110810_162301_userTimestampFix
+
+Apply the above migrations? (yes|no) [no]:
