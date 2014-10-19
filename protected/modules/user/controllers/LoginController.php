@@ -7,7 +7,7 @@ class LoginController extends Controller
 	/**
 	 * Displays the login page
 	 */
-	public function actionLogin()gggggggggg
+	public function actionLogin()
 	{
 		if (Yii::app()->user->isGuest) {
 			$model=new UserLogin;
