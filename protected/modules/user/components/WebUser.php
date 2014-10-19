@@ -30,7 +30,12 @@ class WebUser extends CWebUser
     protected function afterLogin($fromCookie)
 	{
         parent::afterLogin($fromCookie);
-        $this->updateSession();
+        //$this->updateSession();
+
+        // Мой патч для авторизаии черех соцсети
+        if(!Yii::app()->user->getState('service')) {
+            $this->updateSession();
+        }
 	}
 
     public function updateSession() {
