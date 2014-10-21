@@ -52,7 +52,12 @@ class EAuthUserIdentity extends CBaseUserIdentity {
 //deb::dump($this->service);
 //deb::dump($this->service->id);
 //die();
-        $serviceModel = Service::model()->findByPk($this->service->id);
+        //$serviceModel = Service::model()->findByPk($this->service->id, $this->serviceName);
+        $serviceModel = Service::model()->find('identity=:identity AND service_name=:service_name',
+                                                array(':identity' => $this->service->id,
+                                                      ':service_name' => $this->service->serviceName
+                                                     )
+                                              );
         /* ≈сли в таблице tbl_service нет записи с таким id,
            значит надо создать аккаунт и прив€зать к нему сервис.
         - заводитс€ запись в главную таблицу users c логином = user000000, где вместо нулей уникальный незан€тый номер.
@@ -64,43 +69,35 @@ class EAuthUserIdentity extends CBaseUserIdentity {
             {
                 $usermodel = new User;
                 $usermodel->username = User::getNext_service_user_id();
+                $usermodel->email = $usermodel->username;
                 $usermodel->status = 1;
-                $usermodel->create_at = $usermodel->getCreatetime();
-                $usermodel->lastvisit_at = $usermodel->getLastvisit();
+                $usermodel->setCreatetime(time());
+                $usermodel->setLastvisit(time());
+
                 if ($usermodel->save())
                 {
                     $service = new Service();
-                    $service->identity = $this->id;
-                    $service->service_name = $this->serviceName;
+                    $service->identity = $this->service->id;
+                    $service->service_name = $this->service->serviceName;
                     $service->user_id = $usermodel->id;
 
                     if ($service->save())
                     {
+                        $this->id = $usermodel->id;
+                        $this->name = $usermodel->username;
+                        $this->setState('service', $this->service->serviceName);
+
                         $this->errorCode = self::ERROR_NONE;
                     }
                     else{
                         $this->errorCode = self::ERROR_NOT_USER_SERVICE_SAVE;
                     }
-
-
                 }
                 else{
                     $this->errorCode = self::ERROR_NOT_USER_SAVE;
-
                 }
 
 
-                $this->id = $this->service->id;
-                $this->name = $this->service->getAttribute('name');
-
-                $this->setState('service', $this->service->serviceName);
-
-                // You can save all given attributes in session.
-                //$attributes = $this->service->getAttributes();
-                //$session = Yii::app()->session;
-                //$session['eauth_attributes'][$this->service->serviceName] = $attributes;
-
-                $this->errorCode = self::ERROR_NONE;
             }
             else {
                 $this->errorCode = self::ERROR_NOT_AUTHENTICATED;
@@ -109,9 +106,20 @@ class EAuthUserIdentity extends CBaseUserIdentity {
         /* ≈сли запись есть, то используем данные из
         таблицы tbl_users, использу€ св€зь в модели Service */
         else {
-            $this->id = $serviceModel->user->id;
-            $this->name = $serviceModel->user->username;
-            $this->errorCode = self::ERROR_NONE;
+            $usermodel = User::model()->findByPk($serviceModel->user_id);
+
+            if ($usermodel !== null)
+            {
+                $this->id = $usermodel->id;
+                $this->name = $usermodel->username;
+                $this->setState('service', $serviceModel->service_name);
+
+                $this->errorCode = self::ERROR_NONE;
+            }
+            else{
+                $this->errorCode = self::ERROR_NOT_AUTHENTICATED;
+            }
+
         }
 
 
