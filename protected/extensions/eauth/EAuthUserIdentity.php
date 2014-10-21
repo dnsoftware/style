@@ -55,7 +55,7 @@ class EAuthUserIdentity extends CBaseUserIdentity {
         значит сервис не привязан к аккаунту. */
         if($serviceModel === null){
             if ($this->service->isAuthenticated) {
-                $this->id = $this->service->id;
+                $this->id = $this->service->id; 
                 $this->name = $this->service->getAttribute('name');
 
                 $this->setState('service', $this->service->serviceName);
