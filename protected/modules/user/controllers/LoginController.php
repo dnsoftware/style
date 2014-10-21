@@ -37,7 +37,7 @@ class LoginController extends Controller
                             $eauth->redirectUrl = $this->createAbsoluteUrl('/user/profile');
                             $eauth->cancelUrl = $this->createAbsoluteUrl('/user/profile');
 
-/*
+
                             $service = new Service();
                             $service->identity = $eauth->id;
                             $service->service_name = $eauth->serviceName;
@@ -46,7 +46,7 @@ class LoginController extends Controller
                             if ($service->save()) {
                                 $eauth->redirect();
                             }
-*/
+
                         }
                     }
                     else {
