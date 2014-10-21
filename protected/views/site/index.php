@@ -10,8 +10,9 @@ $this->pageTitle=Yii::app()->name;
 <div style="width:500px; height: 100px; margin:60px auto 10px; border: #000 solid 0px;"">
 
     <?
-    deb::dump(Yii::app()->user->getRole());
-    deb::dump(Yii::app()->user);
+    deb::dump(User::getNext_service_user_id());
+    //deb::dump(Yii::app()->user->getRole());
+    //deb::dump(Yii::app()->user);
     ?>
 
 

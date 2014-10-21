@@ -15,6 +15,8 @@
 class EAuthUserIdentity extends CBaseUserIdentity {
 
 	const ERROR_NOT_AUTHENTICATED = 3;
+    const ERROR_NOT_USER_SAVE=5;
+    const ERROR_NOT_USER_SERVICE_SAVE=6;
 
 	/**
 	 * @var EAuthServiceBase the authorization service instance.
@@ -52,10 +54,43 @@ class EAuthUserIdentity extends CBaseUserIdentity {
 //die();
         $serviceModel = Service::model()->findByPk($this->service->id);
         /* Если в таблице tbl_service нет записи с таким id,
-        значит сервис не привязан к аккаунту. */
-        if($serviceModel === null){
-            if ($this->service->isAuthenticated) {
-                $this->id = $this->service->id; 
+           значит надо создать аккаунт и привязать к нему сервис.
+        - заводится запись в главную таблицу users c логином = user000000, где вместо нулей уникальный незанятый номер.
+          т.е. для генерации номера ищем select login WHERE login REGEXP 'user[0-9]{6}' order DESC limit 0,1 и инкрементируем.
+        */
+        if($serviceModel === null)
+        {
+            if ($this->service->isAuthenticated)
+            {
+                $usermodel = new User;
+                $usermodel->username = User::getNext_service_user_id();
+                $usermodel->status = 1;
+                $usermodel->create_at = $usermodel->getCreatetime();
+                $usermodel->lastvisit_at = $usermodel->getLastvisit();
+                if ($usermodel->save())
+                {
+                    $service = new Service();
+                    $service->identity = $this->id;
+                    $service->service_name = $this->serviceName;
+                    $service->user_id = $usermodel->id;
+
+                    if ($service->save())
+                    {
+                        $this->errorCode = self::ERROR_NONE;
+                    }
+                    else{
+                        $this->errorCode = self::ERROR_NOT_USER_SERVICE_SAVE;
+                    }
+
+
+                }
+                else{
+                    $this->errorCode = self::ERROR_NOT_USER_SAVE;
+
+                }
+
+
+                $this->id = $this->service->id;
                 $this->name = $this->service->getAttribute('name');
 
                 $this->setState('service', $this->service->serviceName);
