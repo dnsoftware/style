@@ -56,7 +56,7 @@ class EAuthUserIdentity extends CBaseUserIdentity {
         if($serviceModel === null){
             if ($this->service->isAuthenticated) {
                 $this->id = $this->service->id;
-                $this->name = $this->service->getAttribute('name');
+                $this->name = $this->service->getAttribute('name'); 
 
                 $this->setState('service', $this->service->serviceName);
 
