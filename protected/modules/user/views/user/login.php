@@ -52,28 +52,9 @@ $this->breadcrumbs=array(
 <?php echo CHtml::endForm(); ?>
 </div><!-- form -->
 
-
+<h2>Do you already have an account on one of these sites? Click the logo to log in with it here:</h2>
 <?php
-$form = new CForm(array(
-    'elements'=>array(
-        'username'=>array(
-            'type'=>'text',
-            'maxlength'=>32,
-        ),
-        'password'=>array(
-            'type'=>'password',
-            'maxlength'=>32,
-        ),
-        'rememberMe'=>array(
-            'type'=>'checkbox',
-        )
-    ),
-
-    'buttons'=>array(
-        'login'=>array(
-            'type'=>'submit',
-            'label'=>'Login',
-        ),
-    ),
-), $model);
+$this->widget('application.extensions.eauth.EAuthWidget', array('action' => '/user/login'));
 ?>
+
+

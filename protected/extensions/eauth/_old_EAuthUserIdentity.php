@@ -47,39 +47,24 @@ class EAuthUserIdentity extends CBaseUserIdentity {
 	 * @return boolean whether authentication succeeds.
 	 */
 	public function authenticate() {
-//deb::dump($this->service);
-//deb::dump($this->service->id);
-//die();
-        $serviceModel = Service::model()->findByPk($this->service->id);
-        /* Если в таблице tbl_service нет записи с таким id,
-        значит сервис не привязан к аккаунту. */
-        if($serviceModel === null){
-            if ($this->service->isAuthenticated) {
-                $this->id = $this->service->id;
-                $this->name = $this->service->getAttribute('name');
+		if ($this->service->isAuthenticated) {
+			$this->id = $this->service->id;
+			$this->name = $this->service->getAttribute('name');
 
-                $this->setState('service', $this->service->serviceName);
+			$this->setState('id', $this->id);
+			$this->setState('name', $this->name);
+			$this->setState('service', $this->service->serviceName);
 
-                // You can save all given attributes in session.
-                //$attributes = $this->service->getAttributes();
-                //$session = Yii::app()->session;
-                //$session['eauth_attributes'][$this->service->serviceName] = $attributes;
+			// You can save all given attributes in session.
+			//$attributes = $this->service->getAttributes();
+			//$session = Yii::app()->session;
+			//$session['eauth_attributes'][$this->service->serviceName] = $attributes;
 
-                $this->errorCode = self::ERROR_NONE;
-            }
-            else {
-                $this->errorCode = self::ERROR_NOT_AUTHENTICATED;
-            }
-        }
-        /* Если запись есть, то используем данные из
-        таблицы tbl_users, используя связь в модели Service */
-        else {
-            $this->id = $serviceModel->user->id;
-            $this->name = $serviceModel->user->username;
-            $this->errorCode = self::ERROR_NONE;
-        }
-
-
+			$this->errorCode = self::ERROR_NONE;
+		}
+		else {
+			$this->errorCode = self::ERROR_NOT_AUTHENTICATED;
+		}
 		return !$this->errorCode;
 	}
 

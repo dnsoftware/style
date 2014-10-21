@@ -9,7 +9,49 @@ class LoginController extends Controller
 	 */
 	public function actionLogin()
 	{
-		if (Yii::app()->user->isGuest) {
+        $serviceName = Yii::app()->request->getQuery('service');
+        if (isset($serviceName)) {
+            /** @var $eauth EAuthServiceBase */
+            $eauth = Yii::app()->eauth->getIdentity($serviceName);
+//deb::dump($eauth);
+//die();
+            $eauth->redirectUrl = Yii::app()->user->returnUrl;
+            $eauth->cancelUrl = $this->createAbsoluteUrl('user/login');
+
+            try {
+                if ($eauth->authenticate()) {
+                    //var_dump($eauth->getIsAuthenticated(), $eauth->getAttributes());
+                    $identity = new EAuthUserIdentity($eauth);
+
+                    // successful authentication
+                    if ($identity->authenticate()) {
+                        Yii::app()->user->login($identity);
+                        //var_dump($identity->id, $identity->name, Yii::app()->user->id);exit;
+
+                        // special redirect with closing popup window
+                        $eauth->redirect();
+                    }
+                    else {
+                        // close popup window and redirect to cancelUrl
+                        $eauth->cancel();
+                    }
+                }
+
+                // Something went wrong, redirect to login page
+                $this->redirect(array('user/login'));
+            }
+            catch (EAuthException $e) {
+                // save authentication error to session
+                Yii::app()->user->setFlash('error', 'EAuthException: '.$e->getMessage());
+
+                // close popup window and redirect to cancelUrl
+                $eauth->redirect($eauth->getCancelUrl());
+            }
+        }
+
+
+
+        if (Yii::app()->user->isGuest) {
 			$model=new UserLogin;
 			// collect user input data
 			if(isset($_POST['UserLogin']))

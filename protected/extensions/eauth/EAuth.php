@@ -201,6 +201,11 @@ class EAuth extends CApplicationComponent {
 	public function fromString($identity) {
 		return unserialize($identity);
 	}
+
+    // мой патч, проверка является ли юзер из соцсети
+    public function getIsService(){
+        return Yii::app()->user->getState('service')!==null;
+    }
 }
 
 /**
