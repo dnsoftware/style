@@ -54,3 +54,27 @@ $this->menu=array(
     	<td><?php echo CHtml::encode(User::itemAlias("UserStatus",$model->status)); ?></td>
 	</tr>
 </table>
+
+
+<h2>Связанные с аккаунтом сервисы::</h2>
+<?php
+$this->widget('ext.eauth.EAuthWidget', array(
+    'action' => 'deleteService',
+    'view'=>'linkedServices',
+    'popup'=>false,
+    'predefinedServices'=>$services
+));
+?>
+
+
+<h2>Выберите сервис для привязки к аккаунту:</h2>
+<?php
+$allServices = array_keys(Yii::app()->eauth->getServices());
+$this->widget('ext.eauth.EAuthWidget', array(
+    'action' => 'login/login',
+    'predefinedServices' => array_diff($allServices,$services)));
+?>
+
+
+
+

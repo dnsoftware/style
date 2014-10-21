@@ -15,9 +15,19 @@ class ProfileController extends Controller
 	public function actionProfile()
 	{
 		$model = $this->loadUser();
+
+        $serviceModel = Service::model()->findAllByAttributes(array(
+            'user_id'=>$model->id
+        ));
+        $services = array();
+        foreach ($serviceModel as $row) {
+            $services[] = $row->service_name;
+        }
+
 	    $this->render('profile',array(
 	    	'model'=>$model,
 			'profile'=>$model->profile,
+            'services'=>$services,
 	    ));
 	}
 
@@ -86,6 +96,17 @@ class ProfileController extends Controller
 			$this->render('changepassword',array('model'=>$model));
 	    }
 	}
+
+
+    /* Метод для удаления записи из таблицы tbl_service */
+    public function actionDeleteService(){
+        $service = Service::model()->findByAttributes(array(
+            'service_name'=>Yii::app()->request->getQuery('service'),
+            'user_id'=>Yii::app()->user->id,
+        ));
+        $service->delete();
+        $this->redirect(array('/user/profile'));
+    }
 
 	/**
 	 * Returns the data model based on the primary key given in the GET variable.

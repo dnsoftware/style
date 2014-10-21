@@ -13,23 +13,39 @@ class LoginController extends Controller
         if (isset($serviceName)) {
             /** @var $eauth EAuthServiceBase */
             $eauth = Yii::app()->eauth->getIdentity($serviceName);
-//deb::dump($eauth);
-//die();
             $eauth->redirectUrl = Yii::app()->user->returnUrl;
             $eauth->cancelUrl = $this->createAbsoluteUrl('user/login');
 
             try {
-                if ($eauth->authenticate()) {
+                if ($eauth->authenticate())
+                {
                     //var_dump($eauth->getIsAuthenticated(), $eauth->getAttributes());
                     $identity = new EAuthUserIdentity($eauth);
 
                     // successful authentication
-                    if ($identity->authenticate()) {
-                        Yii::app()->user->login($identity);
-                        //var_dump($identity->id, $identity->name, Yii::app()->user->id);exit;
+                    if ($identity->authenticate())
+                    {
+                        if(Yii::app()->user->isGuest){
+                            Yii::app()->user->login($identity);
+                            //var_dump($identity->id, $identity->name, Yii::app()->user->id);exit;
 
-                        // special redirect with closing popup window
-                        $eauth->redirect();
+                            // special redirect with closing popup window
+                            $eauth->redirect();
+                        }
+                        else
+                        {
+                            $eauth->redirectUrl = $this->createAbsoluteUrl('/user/profile');
+                            $eauth->cancelUrl = $this->createAbsoluteUrl('/user/profile');
+
+                            $service = new Service();
+                            $service->identity = $eauth->id;
+                            $service->service_name = $eauth->serviceName;
+                            $service->user_id = Yii::app()->user->id;
+
+                            if ($service->save()) {
+                                $eauth->redirect();
+                            }
+                        }
                     }
                     else {
                         // close popup window and redirect to cancelUrl
@@ -49,8 +65,7 @@ class LoginController extends Controller
             }
         }
 
-
-
+        else
         if (Yii::app()->user->isGuest) {
 			$model=new UserLogin;
 			// collect user input data

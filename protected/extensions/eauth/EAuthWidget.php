@@ -46,6 +46,9 @@ class EAuthWidget extends CWidget {
 	 */
 	public $cssFile = true;
 
+    // Мое добавление
+    public $view = 'auth';
+
 	/**
 	 * Initializes the widget.
 	 * This method is called by {@link CBaseController::createWidget}
@@ -91,7 +94,7 @@ class EAuthWidget extends CWidget {
 		parent::run();
 
 		$this->registerAssets();
-		$this->render('auth', array(
+		$this->render($this->view, array(
 			'id' => $this->getId(),
 			'services' => $this->services,
 			'action' => $this->action,
