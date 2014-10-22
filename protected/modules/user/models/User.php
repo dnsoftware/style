@@ -196,4 +196,22 @@ class User extends CActiveRecord
     public function setLastvisit($value) {
         $this->lastvisit_at=date('Y-m-d H:i:s',$value);
     }
+
+    public static function getNext_service_user_id()
+    {
+        $model = self::model()->findBySql("SELECT username
+                                            FROM {{users}} WHERE username REGEXP 'user[0-9]{6}'
+                                            ORDER BY username DESC");
+        if ($model !== null)
+        {
+            $new_id = sprintf('%06d', intval(str_replace('user', '', $model->username)) + 1);
+        }
+        else
+        {
+            $new_id = '000001';
+        }
+
+        return 'user'.$new_id;
+    }
+
 }

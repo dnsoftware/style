@@ -15,6 +15,8 @@
 class EAuthUserIdentity extends CBaseUserIdentity {
 
 	const ERROR_NOT_AUTHENTICATED = 3;
+    const ERROR_NOT_USER_SAVE=5;
+    const ERROR_NOT_USER_SERVICE_SAVE=6;
 
 	/**
 	 * @var EAuthServiceBase the authorization service instance.
@@ -50,22 +52,64 @@ class EAuthUserIdentity extends CBaseUserIdentity {
 //deb::dump($this->service);
 //deb::dump($this->service->id);
 //die();
-        $serviceModel = Service::model()->findByPk($this->service->id);
+        //$serviceModel = Service::model()->findByPk($this->service->id, $this->serviceName);
+        $serviceModel = Service::model()->find('identity=:identity AND service_name=:service_name',
+                                                array(':identity' => $this->service->id,
+                                                      ':service_name' => $this->service->serviceName
+                                                     )
+                                              );
         /* Если в таблице tbl_service нет записи с таким id,
-        значит сервис не привязан к аккаунту. */
-        if($serviceModel === null){
-            if ($this->service->isAuthenticated) {
-                $this->id = $this->service->id;
-                $this->name = $this->service->getAttribute('name'); 
+           значит надо создать аккаунт и привязать к нему сервис.
+        - заводится запись в главную таблицу users c логином = user000000, где вместо нулей уникальный незанятый номер.
+          т.е. для генерации номера ищем select login WHERE login REGEXP 'user[0-9]{6}' order DESC limit 0,1 и инкрементируем.
+        */
+        if($serviceModel === null)
+        {
+            if ($this->service->isAuthenticated)
+            {
+                if(Yii::app()->user->isGuest){
+                    $usermodel = new User;
+                    $usermodel->username = User::getNext_service_user_id();
+                    $usermodel->email = $usermodel->username."@".$_SERVER['HTTP_HOST'];
+                    $usermodel->status = 1;
+                    $usermodel->setCreatetime(time());
+                    $usermodel->setLastvisit(time());
 
-                $this->setState('service', $this->service->serviceName);
+                    if ($usermodel->save())
+                    {
+                        $profile = new Profile;
 
-                // You can save all given attributes in session.
-                //$attributes = $this->service->getAttributes();
-                //$session = Yii::app()->session;
-                //$session['eauth_attributes'][$this->service->serviceName] = $attributes;
+                        $profile->first_name = $this->service->getAttribute('name');
+                        $profile->last_name = '';
+                        $profile->user_id = $usermodel->id;
+                        $profile->save();
 
-                $this->errorCode = self::ERROR_NONE;
+                        $service = new Service();
+                        $service->identity = $this->service->id;
+                        $service->service_name = $this->service->serviceName;
+                        $service->user_id = $usermodel->id;
+
+                        if ($service->save())
+                        {
+                            $this->id = $usermodel->id;
+                            $this->name = $usermodel->username;
+                            $this->setState('service', $this->service->serviceName);
+
+                            $this->errorCode = self::ERROR_NONE;
+                        }
+                        else{
+                            $this->errorCode = self::ERROR_NOT_USER_SERVICE_SAVE;
+                        }
+                    }
+                    else{
+                        $this->errorCode = self::ERROR_NOT_USER_SAVE;
+                    }
+                }
+                else{
+                    $this->errorCode = self::ERROR_NONE;
+                }
+
+
             }
             else {
                 $this->errorCode = self::ERROR_NOT_AUTHENTICATED;
@@ -74,9 +118,20 @@ class EAuthUserIdentity extends CBaseUserIdentity {
         /* Если запись есть, то используем данные из
         таблицы tbl_users, используя связь в модели Service */
         else {
-            $this->id = $serviceModel->user->id;
-            $this->name = $serviceModel->user->username;
-            $this->errorCode = self::ERROR_NONE;
+            $usermodel = User::model()->findByPk($serviceModel->user_id);
+
+            if ($usermodel !== null)
+            {
+                $this->id = $usermodel->id;
+                $this->name = $usermodel->username;
+                $this->setState('service', $serviceModel->service_name);
+
+                $this->errorCode = self::ERROR_NONE;
+            }
+            else{
+                $this->errorCode = self::ERROR_NOT_AUTHENTICATED;
+            }
+
         }
 
 

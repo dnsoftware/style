@@ -25,18 +25,18 @@ class LoginController extends Controller
                     // successful authentication
                     if ($identity->authenticate())
                     {
-                        if(Yii::app()->user->isGuest){
+                        $eauth->redirectUrl = $this->createAbsoluteUrl('/user/profile');
+                        $eauth->cancelUrl = $this->createAbsoluteUrl('/user/profile');
+
+                        if(Yii::app()->user->isGuest)
+                        {
                             Yii::app()->user->login($identity);
-                            //var_dump($identity->id, $identity->name, Yii::app()->user->id);exit;
 
                             // special redirect with closing popup window
                             $eauth->redirect();
                         }
                         else
                         {
-                            $eauth->redirectUrl = $this->createAbsoluteUrl('/user/profile');
-                            $eauth->cancelUrl = $this->createAbsoluteUrl('/user/profile');
-
                             $service = new Service();
                             $service->identity = $eauth->id;
                             $service->service_name = $eauth->serviceName;
@@ -45,6 +45,7 @@ class LoginController extends Controller
                             if ($service->save()) {
                                 $eauth->redirect();
                             }
+
                         }
                     }
                     else {

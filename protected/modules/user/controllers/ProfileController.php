@@ -15,7 +15,6 @@ class ProfileController extends Controller
 	public function actionProfile()
 	{
 		$model = $this->loadUser();
-
         $serviceModel = Service::model()->findAllByAttributes(array(
             'user_id'=>$model->id
         ));
