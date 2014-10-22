@@ -67,34 +67,46 @@ class EAuthUserIdentity extends CBaseUserIdentity {
         {
             if ($this->service->isAuthenticated)
             {
-                $usermodel = new User;
-                $usermodel->username = User::getNext_service_user_id();
-                $usermodel->email = $usermodel->username;
-                $usermodel->status = 1;
-                $usermodel->setCreatetime(time());
-                $usermodel->setLastvisit(time());
+                if(Yii::app()->user->isGuest){
+                    $usermodel = new User;
+                    $usermodel->username = User::getNext_service_user_id();
+                    $usermodel->email = $usermodel->username."@".$_SERVER['HTTP_HOST'];
+                    $usermodel->status = 1;
+                    $usermodel->setCreatetime(time());
+                    $usermodel->setLastvisit(time());
 
-                if ($usermodel->save())
-                {
-                    $service = new Service();
-                    $service->identity = $this->service->id;
-                    $service->service_name = $this->service->serviceName;
-                    $service->user_id = $usermodel->id;
-
-                    if ($service->save())
+                    if ($usermodel->save())
                     {
-                        $this->id = $usermodel->id;
-                        $this->name = $usermodel->username;
-                        $this->setState('service', $this->service->serviceName);
+                        $profile = new Profile;
 
-                        $this->errorCode = self::ERROR_NONE;
+                        $profile->first_name = $this->service->getAttribute('name');
+                        $profile->last_name = '';
+                        $profile->user_id = $usermodel->id;
+                        $profile->save();
+
+                        $service = new Service();
+                        $service->identity = $this->service->id;
+                        $service->service_name = $this->service->serviceName;
+                        $service->user_id = $usermodel->id;
+
+                        if ($service->save())
+                        {
+                            $this->id = $usermodel->id;
+                            $this->name = $usermodel->username;
+                            $this->setState('service', $this->service->serviceName);
+
+                            $this->errorCode = self::ERROR_NONE;
+                        }
+                        else{
+                            $this->errorCode = self::ERROR_NOT_USER_SERVICE_SAVE;
+                        }
                     }
                     else{
-                        $this->errorCode = self::ERROR_NOT_USER_SERVICE_SAVE;
+                        $this->errorCode = self::ERROR_NOT_USER_SAVE;
                     }
                 }
                 else{
-                    $this->errorCode = self::ERROR_NOT_USER_SAVE;
+                    $this->errorCode = self::ERROR_NONE;
                 }
 
 
