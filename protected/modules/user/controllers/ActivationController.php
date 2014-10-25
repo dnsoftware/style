@@ -29,4 +29,27 @@ class ActivationController extends Controller
 		}
 	}
 
+
+    public function actionEmailactivate () {
+        $email = $_GET['email'];
+        $activkey = $_GET['activkey'];
+        if ($email&&$activkey) {
+            $find = User::model()->notsafe()->findByAttributes(array('email'=>$email));
+            if (isset($find)&&$find->email_status) {
+                $this->render('/user/message',array('title'=>UserModule::t("E-mail activation"),'content'=>UserModule::t("Ваш e-mail уже активирован.")));
+            } elseif(isset($find->activkey) && ($find->activkey==$activkey)) {
+                $find->activkey = UserModule::encrypting(microtime());
+                $find->email_status = 1;
+                $find->save();
+                $this->render('/user/message',array('title'=>UserModule::t("E-mail activation"),'content'=>UserModule::t("Ваш e-mail активирован.")));
+            } else {
+                $this->render('/user/message',array('title'=>UserModule::t("E-mail activation"),'content'=>UserModule::t("Incorrect activation URL.")));
+            }
+        } else {
+            $this->render('/user/message',array('title'=>UserModule::t("E-mail activation"),'content'=>UserModule::t("Incorrect activation URL.")));
+        }
+    }
+
+
+
 }

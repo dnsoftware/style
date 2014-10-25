@@ -214,4 +214,22 @@ class User extends CActiveRecord
         return 'user'.$new_id;
     }
 
+    // Ïğîâåğêà, ÿâëÿåòñÿ ëè ìûëî òåêóùåãî şçåğà àâòîìàòè÷åñêè ñãåíåğèğîâàííûì ïğè âõîäå ÷åğåç ñîöñåòü
+    public static function isSocialDefaultEmail()
+    {
+       $model = Yii::app()->controller->module->user();
+
+        if ($model !== null)
+        {
+            return preg_match('|user[\d]{6}@w*.{0,1}'.$_SERVER['HTTP_HOST'].'|siU', $model->email, $match);
+            //deb::dump($model);
+        }
+        else
+        {
+            Yii::app()->end();
+        }
+
+    }
+
+
 }

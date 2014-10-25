@@ -39,7 +39,9 @@ class ProfileController extends Controller
 	{
 		$model = $this->loadUser();
 		$profile=$model->profile;
-		
+
+        $old_email = $model->email;
+
 		// ajax validator
 		if(isset($_POST['ajax']) && $_POST['ajax']==='profile-form')
 		{
@@ -51,19 +53,37 @@ class ProfileController extends Controller
 		{
 			$model->attributes=$_POST['User'];
 			$profile->attributes=$_POST['Profile'];
-			
+
 			if($model->validate()&&$profile->validate()) {
 				$model->save();
 				$profile->save();
+
+                if ($old_email != $model->email){
+                    $model->activkey=UserModule::encrypting(microtime().rand(12345, 987654));
+                    $model->email_status=0;
+                    $activation_url = $this->createAbsoluteUrl('/user/activation/emailactivate',array("activkey" => $model->activkey, "email" => $model->email));
+
+                    UserModule::sendMail($model->email,UserModule::t("Вы поменяли e-mail на {site_name}",array('{site_name}'=>Yii::app()->name)),UserModule::t("Пожалуйста, подтвердите его перейдя по ссылке {activation_url}",array('{activation_url}'=>$activation_url)));
+
+                    $model->save();
+
+                    $this->render('/user/message',array('title'=>UserModule::t("Смена e-mail"),'content'=>UserModule::t("Ваш профиль сохранен. На указанный e-mail выслано письмо со ссылкой для подтверждения.")));
+                    Yii::app()->end();
+                }
+
                 Yii::app()->user->updateSession();
 				Yii::app()->user->setFlash('profileMessage',UserModule::t("Changes is saved."));
 				$this->redirect(array('/user/profile'));
+
+
 			} else $profile->validate();
 		}
 
-		$this->render('edit',array(
+        $params['is_social_email'] = User::isSocialDefaultEmail();
+        $this->render('edit',array(
 			'model'=>$model,
 			'profile'=>$profile,
+            'params'=>$params,
 		));
 	}
 	
@@ -97,7 +117,7 @@ class ProfileController extends Controller
 	}
 
 
-    /* ����� ��� �������� ������ �� ������� tbl_service */
+    /* Метод для удаления записи из таблицы tbl_service */
     public function actionDeleteService(){
         $service = Service::model()->findByAttributes(array(
             'service_name'=>Yii::app()->request->getQuery('service'),

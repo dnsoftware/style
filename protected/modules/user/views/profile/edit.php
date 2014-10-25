@@ -60,9 +60,21 @@ $this->menu=array(
 	</div>
 
 	<div class="row">
+        <?
+        $email_visible = 'block';
+        if ($params['is_social_email']){
+            $model->email = '';
+            //$email_visible = 'none';
+            ?>
+            <div style="color: #ff0000;">Требуется заполнить</div>
+            <?
+        }
+        ?>
+        <div style="display: <?= $email_visible;?>;">
 		<?php echo $form->labelEx($model,'email'); ?>
 		<?php echo $form->textField($model,'email',array('size'=>60,'maxlength'=>128)); ?>
 		<?php echo $form->error($model,'email'); ?>
+        </div>
 	</div>
 
 	<div class="row buttons">
