@@ -28,5 +28,5 @@ $this->menu=array(
 		<?php echo CHtml::submitButton(UserModule::t("Восстановить пароль")); ?>
 	</div>
 
-<?php echo CHtml::endForm(); ?>  
+<?php echo CHtml::endForm(); ?>
 </div>
