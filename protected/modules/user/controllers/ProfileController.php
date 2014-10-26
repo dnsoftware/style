@@ -93,26 +93,45 @@ class ProfileController extends Controller
 	public function actionChangepassword() {
 		$model = new UserChangePassword;
 		if (Yii::app()->user->id) {
-			
-			// ajax validator
-			if(isset($_POST['ajax']) && $_POST['ajax']==='changepassword-form')
-			{
-				echo UActiveForm::validate($model);
-				Yii::app()->end();
-			}
-			
-			if(isset($_POST['UserChangePassword'])) {
-					$model->attributes=$_POST['UserChangePassword'];
-					if($model->validate()) {
-						$new_password = User::model()->notsafe()->findbyPk(Yii::app()->user->id);
-						$new_password->password = UserModule::encrypting($model->password);
-						$new_password->activkey=UserModule::encrypting(microtime().$model->password);
-						$new_password->save();
-						Yii::app()->user->setFlash('profileMessage',UserModule::t("New password is saved."));
-						$this->redirect(array("profile"));
-					}
-			}
-			$this->render('changepassword',array('model'=>$model));
+
+            $usermodel = Yii::app()->controller->module->user();
+            //deb::dump(User::checkSetPassword(Yii::app()->user->id));
+            if (User::checkSetPassword(Yii::app()->user->id)){
+                // ajax validator
+                if(isset($_POST['ajax']) && $_POST['ajax']==='changepassword-form')
+                {
+                    echo UActiveForm::validate($model);
+                    Yii::app()->end();
+                }
+
+                if(isset($_POST['UserChangePassword'])) {
+                    $model->attributes=$_POST['UserChangePassword'];
+                    if($model->validate()) {
+                        $new_password = User::model()->notsafe()->findbyPk(Yii::app()->user->id);
+                        $new_password->password = UserModule::encrypting($model->password);
+                        $new_password->activkey=UserModule::encrypting(microtime().$model->password);
+                        $new_password->save();
+                        Yii::app()->user->setFlash('profileMessage',UserModule::t("New password is saved."));
+                        $this->redirect(array("profile"));
+                    }
+                }
+                $this->render('changepassword',array('model'=>$model));
+            }
+            else{
+                if ($usermodel->email_status){
+
+                    $form = new UserRecoveryForm;
+                    $form->login_or_email = $usermodel->email;
+                    $action = $this->createUrl('/user/recovery/recovery');
+                    $this->render('changebutton', array('form'=>$form, 'action'=>$action));
+                }
+                else
+                {
+                    $this->render('/user/message',array('title'=>UserModule::t("Востановление пароля"),'content'=>UserModule::t("Восстановление пароля невозможно, потому что e-mail в вашем аккаунте не был подтвержден.")));
+                    Yii::app()->end();
+                }
+
+            }
 	    }
 	}
 

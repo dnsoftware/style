@@ -9,7 +9,7 @@ class RecoveryController extends Controller
 	 */
 	public function actionRecovery () {
 		$form = new UserRecoveryForm;
-		if (Yii::app()->user->id) {
+		if (Yii::app()->user->id && User::checkSetPassword(Yii::app()->user->id)) {
 		    	$this->redirect(Yii::app()->controller->module->returnUrl);
 		    } else {
 				$email = ((isset($_GET['email']))?$_GET['email']:'');
@@ -41,22 +41,31 @@ class RecoveryController extends Controller
 			    		$form->attributes=$_POST['UserRecoveryForm'];
 			    		if($form->validate()) {
 			    			$user = User::model()->notsafe()->findbyPk($form->user_id);
-							$activation_url = 'http://' . $_SERVER['HTTP_HOST'].$this->createUrl(implode(Yii::app()->controller->module->recoveryUrl),array("activkey" => $user->activkey, "email" => $user->email));
-							
-							$subject = UserModule::t("You have requested the password recovery site {site_name}",
-			    					array(
-			    						'{site_name}'=>Yii::app()->name,
-			    					));
-			    			$message = UserModule::t("You have requested the password recovery site {site_name}. To receive a new password, go to {activation_url}.",
-			    					array(
-			    						'{site_name}'=>Yii::app()->name,
-			    						'{activation_url}'=>$activation_url,
-			    					));
-							
-			    			UserModule::sendMail($user->email,$subject,$message);
-			    			
-							Yii::app()->user->setFlash('recoveryMessage',UserModule::t("Please check your email. An instructions was sent to your email address."));
-			    			$this->refresh();
+
+                            if ($user->email_status){
+                                $activation_url = 'http://' . $_SERVER['HTTP_HOST'].$this->createUrl(implode(Yii::app()->controller->module->recoveryUrl),array("activkey" => $user->activkey, "email" => $user->email));
+
+                                $subject = UserModule::t("You have requested the password recovery site {site_name}",
+                                    array(
+                                        '{site_name}'=>Yii::app()->name,
+                                    ));
+                                $message = UserModule::t("You have requested the password recovery site {site_name}. To receive a new password, go to {activation_url}.",
+                                    array(
+                                        '{site_name}'=>Yii::app()->name,
+                                        '{activation_url}'=>$activation_url,
+                                    ));
+
+                                UserModule::sendMail($user->email,$subject,$message);
+
+                                Yii::app()->user->setFlash('recoveryMessage',UserModule::t("Please check your email. An instructions was sent to your email address."));
+                                $this->refresh();
+                            }
+                            else
+                            {
+                                $this->render('/user/message',array('title'=>UserModule::t("Востановление пароля"),'content'=>UserModule::t("Восстановление пароля невозможно, потому что указанный e-mail не был подтвержден.")));
+                                Yii::app()->end();
+                            }
+
 			    		}
 			    	}
 		    		$this->render('recovery',array('form'=>$form));

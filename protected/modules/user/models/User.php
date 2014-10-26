@@ -56,6 +56,7 @@ class User extends CActiveRecord
 			array('email', 'unique', 'message' => UserModule::t("This user's email address already exists.")),
 			array('username', 'match', 'pattern' => '/^[A-Za-z0-9_]+$/u','message' => UserModule::t("Incorrect symbols (A-z0-9).")),
 			array('status', 'in', 'range'=>array(self::STATUS_NOACTIVE,self::STATUS_ACTIVE,self::STATUS_BANNED)),
+            //array('email_status', 'in', 'range'=>array(0,1)),
 			array('superuser', 'in', 'range'=>array(0,1)),
             array('create_at', 'default', 'value' => date('Y-m-d H:i:s'), 'setOnEmpty' => true, 'on' => 'insert'),
             array('lastvisit_at', 'default', 'value' => '0000-00-00 00:00:00', 'setOnEmpty' => true, 'on' => 'insert'),
@@ -121,7 +122,7 @@ class User extends CActiveRecord
                 'condition'=>'superuser=1',
             ),
             'notsafe'=>array(
-            	'select' => 'id, username, password, email, activkey, create_at, lastvisit_at, superuser, status',
+            	'select' => 'id, username, password, email, activkey, create_at, lastvisit_at, superuser, status, email_status',
             ),
         );
     }
@@ -130,7 +131,7 @@ class User extends CActiveRecord
     {
         return CMap::mergeArray(Yii::app()->getModule('user')->defaultScope,array(
             'alias'=>'user',
-            'select' => 'user.id, user.username, user.email, user.create_at, user.lastvisit_at, user.superuser, user.status',
+            'select' => 'user.id, user.username, user.email, user.create_at, user.lastvisit_at, user.superuser, user.status, user.email_status',
         ));
     }
 	
@@ -212,6 +213,18 @@ class User extends CActiveRecord
         }
 
         return 'user'.$new_id;
+    }
+
+    public static function checkSetPassword($user_id)
+    {
+        $user = self::model()->findBySql("SELECT password
+                                            FROM {{users}} WHERE id = '".$user_id."' ");
+        if (trim($user->password) == ''){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 
     // Проверка, является ли мыло текущего юзера автоматически сгенерированным при входе через соцсеть
