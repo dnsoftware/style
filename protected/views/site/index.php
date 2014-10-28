@@ -10,9 +10,14 @@ $this->pageTitle=Yii::app()->name;
 <div style="width:500px; height: 100px; margin:60px auto 10px; border: #000 solid 0px;"">
 
     <?
-    deb::dump(User::getNext_service_user_id());
-    //deb::dump(Yii::app()->user->getRole());
-    //deb::dump(Yii::app()->user);
+    $gallery = new Gallery();
+    $gallery = $gallery->findByPk(1);
+
+    // render widget in view
+    $this->widget('GalleryManager', array(
+        'gallery' => $gallery,
+        'controllerRoute' => '/gallery', //route to gallery controller
+    ));
     ?>
 
 

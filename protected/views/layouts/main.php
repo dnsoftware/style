@@ -17,6 +17,7 @@ header("Content-type: text/html; charset=utf-8");
 
 
     <? Yii::app()->getClientScript()->registerCoreScript( 'jquery.ui' );?>
+    <?php Yii::app()->bootstrap->register(); ?>
 
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css" />
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css" />
