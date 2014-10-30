@@ -5,7 +5,7 @@
  *
  * @author Bogdan Savluk <savluk.bogdan@gmail.com>
  */
-class GalleryManager extends CWidget
+class LooksetManager extends CWidget
 {
     /** @var Gallery Model of gallery to manage */
     public $gallery;
@@ -15,7 +15,7 @@ class GalleryManager extends CWidget
 
     public function init()
     {
-        $this->assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/assets');
+        $this->assets = Yii::app()->getAssetManager()->publish(dirname(__FILE__) . '/../assets');
     }
 
 
@@ -77,7 +77,7 @@ class GalleryManager extends CWidget
         $this->htmlOptions['id'] = $this->id;
         $this->htmlOptions['class'] = 'GalleryEditor';
 
-        $this->render('galleryManager');
+        $this->render('application.modules.'.Yii::app()->controller->module->id.'.views.galleryManager');
     }
 
 }
