@@ -138,6 +138,7 @@
         function editClick(e) {
             e.preventDefault();
             var photo = $(this).closest('.photo');
+            //console.log(photo);
             var id = photo.data('id');
             editPhotos([id]);
             return false;
@@ -172,6 +173,7 @@
             var data = [];
             $('.photo', $sorter).each(function () {
                 var t = $(this);
+                //console.log(t.data('id'));
                 data.push('order[' + t.data('id') + ']=' + t.data('rank'));
             });
             $.ajax({
@@ -217,7 +219,6 @@
                             // exception !!!
                         }
                         $uploadProgress.css('width', '' + (5 + 95 * uploadedCount / filesCount) + '%');
-                        console.log(uploadedCount);
                         if (uploadedCount === filesCount) {
                             $uploadProgress.css('width', '100%');
                             $progressOverlay.hide();
