@@ -50,17 +50,20 @@ class LooksetManager extends CWidget
                 'rank' => $photo->rank,
                 'name' => (string)$photo->name,
                 'description' => (string)$photo->description,
-                'preview' => $photo->getPreview(),
+                'preview' => $photo->getUrl('small'),
             );
         }
 
         $opts = array(
-            'hasName' => $this->gallery->name ? true : false,
-            'hasDesc' => $this->gallery->description ? true : false,
+            'hasName' => $this->gallery->hasName ? true : false,
+            'hasDesc' => $this->gallery->hasDesc ? true : false,
             'uploadUrl' => Yii::app()->createUrl($this->controllerRoute . '/ajaxUpload', array('gallery_id' => $this->gallery->id)),
             'deleteUrl' => Yii::app()->createUrl($this->controllerRoute . '/delete'),
             'updateUrl' => Yii::app()->createUrl($this->controllerRoute . '/changeData'),
             'arrangeUrl' => Yii::app()->createUrl($this->controllerRoute . '/order'),
+            'setmainUrl' => Yii::app()->createUrl($this->controllerRoute . '/setmain'),
+            'selectphotoUrl' => Yii::app()->createUrl($this->controllerRoute . '/selectphoto'),
+            'main_id' => $this->gallery->main_id,
             'nameLabel' => Yii::t('galleryManager.main', 'Name'),
             'descriptionLabel' => Yii::t('galleryManager.main', 'Description'),
             'photos' => $photos,

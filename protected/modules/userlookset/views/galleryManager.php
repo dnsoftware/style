@@ -15,13 +15,13 @@
             <input type="file" name="image" class="afile" accept="image/*" multiple="multiple"/>
         </span>
 
-        <div class="btn-group">
-            <label class="btn">
-                <input type="checkbox" style="margin: 0;" class="select_all"/>
-                <?php echo Yii::t('galleryManager.main', 'Select all');?>
+        <div class="btn-group" style="display: none;">
+            <label class="btn" style=" height: 18px;">
+                <input type="checkbox" style="margin: 0;" class="select_all"/>&nbsp;
+                <?php /*echo Yii::t('galleryManager.main', 'Select all');*/?>
             </label>
-            <span class="btn disabled edit_selected"><i class="icon-pencil"></i> <?php echo Yii::t('galleryManager.main', 'Edit');?></span>
-            <span class="btn disabled remove_selected"><i class="icon-remove"></i> <?php echo Yii::t('galleryManager.main', 'Remove');?></span>
+            <span class="btn disabled edit_selected"><i class="icon-pencil"></i><?php /*echo Yii::t('galleryManager.main', 'Edit');*/?></span>
+            <span class="btn disabled remove_selected"><i class="icon-remove"></i> <?php /*echo Yii::t('galleryManager.main', 'Remove');*/?></span>
         </div>
     </div>
     <hr/>
@@ -32,7 +32,7 @@
     </div>
 
     <!-- Modal window to edit photo information -->
-    <div class="modal hide editor-modal">
+    <div class="modal hide editor-modal" style="width: 100%; margin-left: -50%; height: 95%; margin-top: -50px;">
         <div class="modal-header">
             <a class="close" data-dismiss="modal">×</a>
 

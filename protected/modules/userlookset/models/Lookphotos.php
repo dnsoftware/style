@@ -23,6 +23,9 @@ class Lookphotos extends CActiveRecord
     /** @var string directory in web root for galleries */
     public $galleryDir = 'gallery';
 
+    public static $markedImageWidth = 450;
+
+
     /**
      * Returns the static model of the specified AR class.
      * @param string $className active record class name.

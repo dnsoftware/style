@@ -25,9 +25,9 @@ header("Content-type: text/html; charset=utf-8");
 	<title><?php echo CHtml::encode($this->pageTitle); ?></title>
 </head>
 
-<body>
+<body >
 
-<div class="container" id="page">
+<div class="container" style="max-width: 960px" id="page">
 	<div id="header">
 		<div id="logo"><?php echo CHtml::encode(Yii::app()->name); ?></div>
 	</div><!-- header -->

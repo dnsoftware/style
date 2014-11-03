@@ -36,6 +36,47 @@ class LooksetController extends CController
     }
 
     /**
+     * Делавем фото главным.
+     * On success returns 'OK'
+     */
+    public function actionSetmain()
+    {
+        $id = $_POST['id'];
+        /** @var $photos Lookphotos[] */
+        $photo = Lookphotos::model()->findByPk($id);
+        if ($photo !== null){
+            $gallery = Lookset::model()->findByPk($photo->gallery_id);
+            $gallery->main_id = $id;
+            if ($gallery->save())
+                echo 'OK';
+            else
+                echo 'Не сохранено';
+        }
+        else throw new CHttpException(400, 'Photo, not found');
+
+    }
+
+    /**
+     * Генерация блока работы с картинкой.
+     * On success returns 'OK'
+     */
+    public function actionSelectphoto()
+    {
+        $id = $_POST['id'];
+        /** @var $photos Lookphotos[] */
+        $photo = Lookphotos::model()->findByPk($id);
+        if ($photo !== null){
+            $gallery = Lookset::model()->findByPk($photo->gallery_id);
+
+            $params['imgurl'] = '/'.$photo->galleryDir.'/'.$id.'big'.'.'.$photo->galleryExt;
+            $this->renderPartial('selectphoto', array('model'=>$photo, 'params'=>$params));
+
+        }
+        else throw new CHttpException(400, 'Photo, not found');
+
+    }
+
+    /**
      * Method to handle file upload thought XHR2
      * On success returns JSON object with image info.
      * @param $gallery_id string Gallery Id to upload images

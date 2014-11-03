@@ -14,6 +14,8 @@
         deleteUrl: '',
         updateUrl: '',
         arrangeUrl: '',
+        setmainUrl: '',
+        selectphotoUrl: '',
 
         photos: []
     };
@@ -70,13 +72,19 @@
             return $(html);
         }
 
-        var photoTemplate = '<div class="photo">' + '<div class="image-preview"><img src=""/></div><div class="caption">';
-        if (opts.hasName)photoTemplate += '<h5></h5>';
-        if (opts.hasDesc)photoTemplate += '<p></p>';
-        photoTemplate += '</div><div class="actions">';
+        var photoTemplate = '<div class="photo">' + '<div class="image-preview"><img src=""/></div>' +
+            '';
+        photoTemplate += '<div class="actions">';
         if (opts.hasName || opts.hasDesc)photoTemplate += '<span class="editPhoto btn btn-primary btn-mini"><i class="icon-pencil icon-white"></i></span> ';
         photoTemplate += '<span class="deletePhoto btn btn-danger btn-mini"><i class="icon-remove icon-white"></i></span>' +
-            '</div><input type="checkbox" class="photo-select"/></div>';
+            '</div>';
+        photoTemplate += '<span class="setmainPhoto btn btn-mini" title="Сделать главной">Главная:<i class="icon-star icon-white"></i></span> ';
+        photoTemplate += '<br><div class="caption">';
+        if (opts.hasName)photoTemplate += '<h5></h5>';
+        if (opts.hasDesc)photoTemplate += '<p></p>';
+        photoTemplate += '</div>';
+        photoTemplate += '<div class="chechone">' +
+            '<input type="checkbox" class="photo-select"/></div></div>';
 
 
         function addPhoto(id, src, name, description, rank) {
@@ -163,11 +171,56 @@
             updateButtons();
         }
 
+        function setmainClick(e) {
+            e.preventDefault();
+            var photo = $(this).closest('.photo');
+            var id = photo.data('id');
+
+            setmainPhoto([id]);
+            return false;
+        }
+
+        function setmainPhoto(id) {
+            $.ajax({
+                type: 'POST',
+                url: opts.setmainUrl,
+                data: 'id=' + id + csrfParams,
+                success: function (t) {
+                    if (t == 'OK') {
+                        var photo = photos[id];
+                        $('.setmainPhoto.btn-success', $images).removeClass('btn-success');
+                        $('.setmainPhoto', photo).addClass('btn-success');
+
+                        //console.log();
+                    } else alert(t);
+                }});
+        }
+
+        function selectphotoClick(e) {
+            //e.preventDefault();
+            var photo = $(this).closest('.photo');
+            var id = photo.data('id');
+
+            $('.photo.current', $images).removeClass('current');
+            var $this = $(this);
+            $this.closest('.photo').addClass('current');
+
+            $.ajax({
+                type: 'POST',
+                url: opts.selectphotoUrl,
+                data: 'id=' + id + csrfParams,
+                success: function (t) {
+                    $('#lookeditor').html(t);
+                }});
+        }
+
         $images
             .on('click', '.photo .deletePhoto', deleteClick)
             .on('click', '.photo .editPhoto', editClick)
-            .on('click', '.photo .photo-select', selectChanged);
+            .on('click', '.photo .photo-select', selectChanged)
+            .on('click', '.photo .setmainPhoto', setmainClick);
 
+        $images.on('click', '.photo', selectphotoClick);
 
         $('.images', $sorter).sortable({ tolerance: "pointer" }).disableSelection().bind("sortstop", function () {
             var data = [];
@@ -370,6 +423,11 @@
             var resp = opts.photos[i];
             addPhoto(resp['id'], resp['preview'], resp['name'], resp['description'], resp['rank']);
         }
+
+        // Установка главного фото
+        //$('.setmainPhoto', mainphoto).removeClass('btn-success');
+        mainphoto = photos[opts.main_id];
+        if (mainphoto) $('.setmainPhoto', mainphoto).addClass('btn-success');
     }
 
     // The actual plugin

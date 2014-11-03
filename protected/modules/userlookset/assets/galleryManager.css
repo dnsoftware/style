@@ -2,12 +2,16 @@
 .GalleryEditor {
     position: relative;
     border: 1px solid #DDD;
+
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
     -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
     -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
-    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+
+    /*box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);*/
+
+    width: 190px;
 }
 
 .GalleryEditor div.gform {
@@ -23,25 +27,27 @@
 .GalleryEditor .photo {
     position: relative;
     float: left;
+    cursor: pointer;
     background-color: #fff;
     margin: 4px;
-    height: 178px;
-    width: 140px;
-
+    /*height: 178px;*/
+    width: 170px;
     display: block;
     padding: 4px;
     line-height: 1;
-    border: 1px solid #DDD;
-    -webkit-border-radius: 4px;
+    border-bottom: 1px solid #DDD;
+    /*-webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
     -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
     -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+    */
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);
+
 }
 
 .GalleryEditor .photo img {
-    width: 140px;
+    /*width: 140px;*/
     height: auto;
 }
 
@@ -52,9 +58,10 @@
 .GalleryEditor .photo .actions {
     float: right;
 
-    position: absolute;
+/*    position: absolute;
     bottom: 4px;
     right: 4px;
+*/
 }
 
 .GalleryEditor hr {
@@ -87,9 +94,8 @@
 .GalleryEditor .preview {
     overflow: hidden;
     width: 200px;
-    height: 156px;
+    /*height: 156px;*/
     margin-right: 10px;
-    overflow: hidden;
     float: left;
 }
 
@@ -98,7 +104,7 @@
 }
 
 .GalleryEditor .photo-editor {
-    min-height: 156px;
+    min-height: 256px;
     margin-bottom: 4px;
     padding: 4px;
     border: 1px solid #DDD;
@@ -114,11 +120,23 @@
     margin-bottom: 0;
 }
 
+.GalleryEditor .caption
+{
+    float: left;
+    width: 77px;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
 .GalleryEditor .caption h5 {
     margin: 0;
-    font-size: 13px;
-    white-space: nowrap;
+    font-size: 10px;
+    font-weight: normal;
+    /*white-space: nowrap;*/
+    max-height: 50px;
+    line-height: 100%;
     overflow: hidden;
+    width: 100%;
 }
 .GalleryEditor .caption p {
     height: 3em;
@@ -128,32 +146,46 @@
 
 /* fixed thumbnail sizes */
 .GalleryEditor.no-desc .photo {
-    height: 138px;
+    /*height: 138px;*/
 }
 
 .GalleryEditor.no-name .photo {
-    height: 160px;
+    /*height: 160px;*/
 }
 
 .GalleryEditor.no-name-no-desc .photo {
-    height: 120px;
+    /*height: 120px;*/
 }
 
 .GalleryEditor .image-preview {
-    height: 88px;
+    /*height: 88px;*/
     overflow: hidden;
+    float: left;
+}
+
+.GalleryEditor .image-preview img {
+    /*margin-top: -20px;
+    margin-bottom: -20px;
+    */
+    width: 90px;
 }
 
 /* item selection */
 .GalleryEditor .photo-select {
-    position: absolute;
+    /*position: absolute;
     bottom: 8px;
     left: 8px;
+    */
+    margin: 5px;
 }
 
 .GalleryEditor .photo.selected {
     background-color: #cef;
     border-color: blue;
+}
+
+.GalleryEditor .photo.current {
+    background-color: #ddffa1;
 }
 
 /* drag & drop hint above gallery */
@@ -216,4 +248,28 @@
 .GalleryEditor .progress-overlay .modal{
     position: relative;
     top: 80px;
+}
+
+.GalleryEditor .edit_selected
+{
+    height: 18px;
+}
+
+.GalleryEditor .remove_selected
+{
+    height: 18px;
+}
+
+.GalleryEditor .chechone
+{
+    display: none;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.GalleryEditor .setmainPhoto
+{
+    position: absolute;
+    right: 5px;
+    bottom:10px;
 }
