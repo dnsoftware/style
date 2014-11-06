@@ -4,6 +4,8 @@ class DefaultController extends Controller
 {
 	public function actionIndex()
 	{
-		$this->render('index');
+        $tagmodel = new Looktags;
+
+        $this->render('index', array('tagmodel'=>$tagmodel));
 	}
 }

@@ -16,6 +16,37 @@ class LooksetController extends CController
     {
         return array(
             'postOnly + delete, ajaxUpload, order, changeData',
+            'accessControl',
+        );
+    }
+
+    /**
+     * Specifies the access control rules.
+     * This method is used by the 'accessControl' filter.
+     * @return array access control rules
+     */
+    public function accessRules()
+    {
+        return array(
+            array('allow',  // allow all users to perform 'index' and 'view' actions
+                'actions'=>array('selectphoto'),
+                'users'=>array('*'),
+            ),
+            array('allow',  // allow all users to perform 'index' and 'view' actions
+                'actions'=>array('ajaxupload', 'delete', 'setmain', 'order', 'savedata', 'savetag'),
+                'users'=>array('@'),
+            ),
+            /*
+            array('allow', // allow admin user to perform 'admin' and 'delete' actions
+                'actions'=>array('create','update','view','admin','delete'),
+                'users'=>UserModule::getAdmins(),
+            ),
+            */
+
+            array('deny',  // deny all users
+                'users'=>array('*'),
+            ),
+
         );
     }
 
@@ -69,6 +100,7 @@ class LooksetController extends CController
             $gallery = Lookset::model()->findByPk($photo->gallery_id);
 
             $params['imgurl'] = '/'.$photo->galleryDir.'/'.$id.'big'.'.'.$photo->galleryExt;
+
             $this->renderPartial('selectphoto', array('model'=>$photo, 'params'=>$params));
 
         }
@@ -88,6 +120,7 @@ class LooksetController extends CController
         $model->gallery_id = $gallery_id;
         $imageFile = CUploadedFile::getInstanceByName('image');
         $model->file_name = $imageFile->getName();
+        $model->user_id = Yii::app()->user->id;
         $model->save();
 
         $model->setImage($imageFile->getTempName());
@@ -167,4 +200,37 @@ class LooksetController extends CController
         }
         echo CJSON::encode($resp);
     }
+
+
+    public function actionSavetag()
+    {
+
+        if (isset($_REQUEST['Looktags']['id']) && intval($_REQUEST['Looktags']['id']) > 0)
+        {
+            $model = Looktags::model()->findByPk($_REQUEST['Looktags']['id']);
+        }
+        else
+        {
+            $model = new Looktags;
+        }
+
+        $model->attributes = $_POST['Looktags'];
+
+//        $model->save();
+
+        $res = array();
+
+        if($model->validate()){
+            $res['status'] = 'ok';
+            $res['data'] = $model->attributes;
+        }
+        else{
+            $res['status'] = 'error';
+            $res['data'] = $model->getErrors();
+       }
+
+        echo CJSON::encode($res);
+        //echo "Попал";
+    }
+
 }

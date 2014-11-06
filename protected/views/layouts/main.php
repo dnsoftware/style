@@ -14,6 +14,9 @@ header("Content-type: text/html; charset=utf-8");
 	<!--[if lt IE 8]>
 	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/ie.css" media="screen, projection" />
 	<![endif]-->
+    <? Yii::app()->getClientScript()
+        ->registerCssFile(Yii::app()->getClientScript()
+        ->getCoreScriptUrl() . '/jui/css/base/jquery-ui.css' );?>
 
 
     <? Yii::app()->getClientScript()->registerCoreScript( 'jquery.ui' );?>
