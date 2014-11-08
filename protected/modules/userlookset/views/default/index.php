@@ -8,6 +8,57 @@ $this->breadcrumbs=array(
 
 ?>
 
+<style>
+    #markeredit
+    {
+        position: absolute;
+        width: 250px;
+        height: 200px;
+        background-color: #fff;
+        border: #f00 solid 1px;
+        display: block;
+        z-index: 120;
+        height: auto;
+    }
+
+    #bg_layer {
+        position: absolute;
+        /*z-index: 100;
+        */
+        width: 100%;
+        height: 100%;
+        background: #000;
+        opacity: 0.01;
+        display: none;
+        left: 0px;
+        top: 0px;
+    }
+
+    .lookmarker
+    {
+        height: 12px;
+        width: 12px;
+        position: absolute;
+        top: 24px;
+        left: 100px;
+        /*text-indent: -9999px;
+        */
+        border-radius: 50%;
+        border: 2px solid #FFF;
+        background-color: #E92E7D;
+        box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.41);
+        cursor: pointer;
+    }
+
+    .editimage
+    {
+        position: relative;
+        border: #ff0000 solid 0px;
+        display: inline-block;
+    }
+
+</style>
+
 <script language="javascript">
 
 function escapeHtml(text) {
@@ -59,25 +110,30 @@ function markerDataProvider(res_str)
     {
         markers[$('#markeredit').data('lookmarker_kod')].data('str_data', res_str);
 
-        $('#markeredit_form input[type=text]').each( function (number, element) {
+        //$('#markeredit_form input[type=text]').each( function (number, element) {
+        $('#markeredit_form [dbfield]').each( function (number, element) {
                 dbfield = element.getAttribute('dbfield');
                 if (typeof res["data"][dbfield] !='undefined')
                 {
-                    element.value = res["data"][dbfield];
-                    if (dbfield=='id')
-                    {
-                        markers[$('#markeredit').data('lookmarker_kod')].data('db_id', res["data"][dbfield]);
+                    if($(element).is('input')){
+                        element.value = res["data"][dbfield];
+
+                        if (dbfield=='id')
+                        {
+                            markers[$('#markeredit').data('lookmarker_kod')].data('db_id', res["data"][dbfield]);
+                        }
                     }
-                    //console.log(res["data"][dbfield]);
+
+                    if($(element).is('select')){
+                        //console.log("[value='"+res["data"][dbfield]+"']");
+                        $(element).find("[value='"+res["data"][dbfield]+"']").attr("selected", "selected");
+
+                    }
                 }
             }
 
         );
 
-        //for( index in res["data"] ) {
-            //console.log(index);
-            //escapeHtml(res["data"][index]);
-        //}
 
     }
 
@@ -110,7 +166,7 @@ $this->widget('LooksetManager', array(
 
 
 <div id="markeredit" >
-    <div style="float: right; " onclick="hideMarkerEdit();" >X</div>
+    <div style="float: right; cursor: pointer; " onclick="hideMarkerEdit();" >X</div>
     <div style="clear: both; margin-left: 10px;">
 
         <div id="markeredit_error"></div>
@@ -143,6 +199,18 @@ $this->widget('LooksetManager', array(
             <div class="row">
                 <?php echo CHtml::activeLabel($tagmodel,'name'); ?>
                 <?php echo CHtml::activeTextField($tagmodel,'name', array('dbfield'=>'name')); ?>
+            </div>
+
+            <div class="row">
+                <?php //echo CHtml::activeLabel($clothtype_model,'ct_id'); ?>
+                <?php echo CHtml::activeDropDownList($tagmodel,'ct_id',
+                    $clothtype_spr,
+                    array(
+                        'dbfield'=>'ct_id',
+                        'options'=>array(
+                                //'4'=>array('selected'=>'selected')
+                                )
+                         )); ?>
             </div>
             <?
             // Второй параметр пуст, значит отсылаем данные на тот же URL.

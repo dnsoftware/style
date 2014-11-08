@@ -6,57 +6,6 @@
  * Time: 23:32
  */
 ?>
-<style>
-.lookmarker
-{
-    height: 12px;
-    width: 12px;
-    position: absolute;
-    top: 24px;
-    left: 100px;
-    /*text-indent: -9999px;
-    */
-    border-radius: 50%;
-    border: 2px solid #FFF;
-    background-color: #E92E7D;
-    box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.41);
-    cursor: pointer;
-}
-
-.editimage
-{
-    position: relative;
-    border: #ff0000 solid 0px;
-    display: inline-block;
-}
-
-#markeredit
-{
-    position: absolute;
-    width: 250px;
-    height: 200px;
-    background-color: #fff;
-    border: #f00 solid 1px;
-    display: block;
-    z-index: 120;
-    height: auto;
-}
-
-#bg_layer {
-    position: absolute;
-    /*z-index: 100;
-    */
-    width: 100%;
-    height: 100%;
-    background: #000;
-    opacity: 0.1;
-    display: none;
-    left: 0px;
-    top: 0px;
-}
-
-
-</style>
 
 <div class="editimage">
 <img photoid="<?= $model->id;?>" width="<?= Lookphotos::$markedImageWidth;?>" src="<?= $params['imgurl'];?>">
@@ -72,18 +21,20 @@
     var markerTemplate = '<span class="lookmarker"></span>';
     var marker_counter = 0;
     var markers = {};
-    var editimage_width = $('.editimage').width();
-    var editimage_height = $('.editimage').height();
+    var $editimage = $('.editimage');
+    var editimage_width = $editimage.width();
+    var editimage_height = $editimage.height();
 
-    $('#bg_layer').offset().left = $('.editimage').offset().left;
-    $('#bg_layer').offset().top = $('.editimage').offset().top;
+    $bg_layer = $('#bg_layer');
+    $bg_layer.offset().left = $editimage.offset().left;
+    $bg_layer.offset().top = $editimage.offset().top;
 
-    $('#bg_layer').on('click', function (e) {
+    $bg_layer.on('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
     });
 
-    $('.editimage').on('click', function (e) {
+    $editimage.on('click', function (e) {
         xabs = $(this).offset().left;
         yabs = $(this).offset().top;
         xclick = e.pageX-xabs;
@@ -104,6 +55,8 @@
     // если e=null - значит идет загрузка данных из базы, иначе - создание маркера по клику
     function lookmarkConstructor(xmarker, ymarker, e=null, str_data=null)
     {
+        $markeredit = $('#markeredit');
+
         xmarker = Math.round(xmarker);
         ymarker = Math.round(ymarker);
 
@@ -118,11 +71,11 @@
 
         if (e != null)
         {
-            $('#markeredit').data('lookmarker_kod', marker_counter);
-            $('#markeredit').show();
-            $('#bg_layer').show();
-            $('#markeredit').css("left", e.pageX+14);
-            $('#markeredit').css("top", e.pageY-14);
+            $markeredit.data('lookmarker_kod', marker_counter);
+            $markeredit.show();
+            $bg_layer.show();
+            $markeredit.css("left", e.pageX+14);
+            $markeredit.css("top", e.pageY-14);
         }
 
         if (str_data != null)
@@ -142,7 +95,7 @@
             stop:function(event, ui){
                 setMarkereditKoords();
 
-                $('#markeredit').data('lookmarker_kod', lookmarker.data('kod'))
+                $markeredit.data('lookmarker_kod', lookmarker.data('kod'))
                 perc_koords = setPercentKoords();
                 changeKoords();
             },
@@ -151,8 +104,8 @@
 
         function setMarkereditKoords()
         {
-            $('#markeredit').css("left", lookmarker.offset().left+21);
-            $('#markeredit').css("top", lookmarker.offset().top-7);
+            $markeredit.css("left", lookmarker.offset().left+21);
+            $markeredit.css("top", lookmarker.offset().top-7);
         }
 
         function changeKoords()
@@ -174,8 +127,8 @@
         function setPercentKoords()
         {
             var koords = [];
-            koords['x'] = (lookmarker.offset().left - $('.editimage').offset().left)/editimage_width;
-            koords['y'] = (lookmarker.offset().top - $('.editimage').offset().top)/editimage_height;
+            koords['x'] = (lookmarker.offset().left - $editimage.offset().left)/editimage_width;
+            koords['y'] = (lookmarker.offset().top - $editimage.offset().top)/editimage_height;
             $('#x_koord').val(koords['x']);
             $('#y_koord').val(koords['y']);
 
@@ -186,15 +139,15 @@
             e.preventDefault();
             e.stopPropagation();
 
-            $('#markeredit').css("left", e.pageX+14);
-            $('#markeredit').css("top", e.pageY-14);
-            $('#markeredit').data('lookmarker_kod', lookmarker.data('kod'));
+            $markeredit.css("left", e.pageX+14);
+            $markeredit.css("top", e.pageY-14);
+            $markeredit.data('lookmarker_kod', lookmarker.data('kod'));
             markerDataProvider(lookmarker.data('str_data'));
-            //            setPercentKoords();
+
             $('#markeredit, #bg_layer').show();
         });
 
-        $('.editimage').append(lookmarker);
+        $editimage.append(lookmarker);
         setPercentKoords();
     }
 

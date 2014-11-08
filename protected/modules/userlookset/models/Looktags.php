@@ -26,7 +26,8 @@ class Looktags extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-            array('p_id, name, x_koord, y_koord', 'required'),
+            array('p_id, name, x_koord, y_koord, ct_id', 'required'),
+            array('ct_id', 'numerical', 'min'=>1),
 
 		);
 	}
