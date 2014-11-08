@@ -70,6 +70,8 @@
 
 
     var markerTemplate = '<span class="lookmarker"></span>';
+    var marker_counter = 0;
+    var markers = {};
 
     $('#bg_layer').offset().left = $('.editimage').offset().left;
     $('#bg_layer').offset().top = $('.editimage').offset().top;
@@ -86,8 +88,18 @@
         yclick = e.pageY-yabs;
         xmarker = xclick-7;
         ymarker = yclick-7;
-        console.log(e);
+
+        clearMarkeredit();
+
+        marker_counter++;
+
         var lookmarker = $(markerTemplate);
+
+        markers[marker_counter] = lookmarker;
+        lookmarker.data('kod', marker_counter);
+
+        $('#markeredit').data('lookmarker_kod', marker_counter);
+
         lookmarker.css("left", xmarker);
         lookmarker.css("top", ymarker);
 
@@ -100,15 +112,48 @@
 
         lookmarker.draggable({
             drag:function(event, ui){
-                $('#markeredit').css("left", lookmarker.offset().left+21);
-                $('#markeredit').css("top", lookmarker.offset().top-7);
+                setMarkereditKoords();
             },
             stop:function(event, ui){
-                $('#markeredit').css("left", lookmarker.offset().left+21);
-                $('#markeredit').css("top", lookmarker.offset().top-7);
+                setMarkereditKoords();
+
+                perc_koords = setPercentKoords();
+                changeKoords();
             },
             containment:"parent"
         });
+
+        function setMarkereditKoords()
+        {
+            $('#markeredit').css("left", lookmarker.offset().left+21);
+            $('#markeredit').css("top", lookmarker.offset().top-7);
+        }
+
+        function changeKoords()
+        {
+            if (lookmarker.data('db_id') > 0)
+            {
+                $.ajax({
+                    type: 'post',
+                    url: '/index.php?r=userlookset/lookset/savetagkoords',
+                    data: 'id='+lookmarker.data('db_id')+'&x_koord='+perc_koords['x']+'&y_koord='+perc_koords['y'],
+                    success: function(res){
+                        markerDataProvider(res);
+                    }
+                })
+            }
+        }
+
+        function setPercentKoords()
+        {
+            var koords = [];
+            koords['x'] = (lookmarker.offset().left - $('.editimage').offset().left)/$('.editimage').width();
+            koords['y'] = (lookmarker.offset().top - $('.editimage').offset().top)/$('.editimage').height();
+            $('#x_koord').val(koords['x']);
+            $('#y_koord').val(koords['y']);
+
+            return koords;
+        }
 
         lookmarker.on('click', function (e) {
             e.preventDefault();
@@ -117,21 +162,17 @@
             $('#markeredit').css("left", e.pageX+14);
             $('#markeredit').css("top", e.pageY-14);
 
+            $('#markeredit').data('lookmarker_kod', lookmarker.data('kod'));
+            markerDataProvider(lookmarker.data('str_data'));
+//            setPercentKoords();
             $('#markeredit, #bg_layer').show();
         });
 
         $('.editimage').append(lookmarker);
+        setPercentKoords();
+
 
     });
-
-
-    function hideMarkerEdit()
-    {
-        $('#markeredit').hide();
-        $('#bg_layer').hide();
-    }
-
-
 
 
 </script>

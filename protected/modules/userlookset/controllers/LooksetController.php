@@ -33,7 +33,7 @@ class LooksetController extends CController
                 'users'=>array('*'),
             ),
             array('allow',  // allow all users to perform 'index' and 'view' actions
-                'actions'=>array('ajaxupload', 'delete', 'setmain', 'order', 'savedata', 'savetag'),
+                'actions'=>array('ajaxupload', 'delete', 'setmain', 'order', 'savedata', 'savetag', 'savetagkoords'),
                 'users'=>array('@'),
             ),
             /*
@@ -216,13 +216,15 @@ class LooksetController extends CController
 
         $model->attributes = $_POST['Looktags'];
 
-//        $model->save();
-
         $res = array();
 
         if($model->validate()){
-            $res['status'] = 'ok';
-            $res['data'] = $model->attributes;
+            if ($model->save()){
+                $res['status'] = 'ok';
+                $return = $model->attributes;
+                //$return['id'] = $model->getPrimaryKey();
+                $res['data'] = $return;
+            }
         }
         else{
             $res['status'] = 'error';
@@ -232,5 +234,33 @@ class LooksetController extends CController
         echo CJSON::encode($res);
         //echo "Попал";
     }
+
+    public function actionSavetagkoords()
+    {
+
+        $res = array();
+
+        if (isset($_REQUEST['id']) && intval($_REQUEST['id']) > 0)
+        {
+            $model = Looktags::model()->findByPk($_REQUEST['id']);
+            $model->x_koord = $_POST['x_koord'];
+            $model->y_koord = $_POST['y_koord'];
+            if ($model->save()){
+                $res['status'] = 'ok';
+                $return = $model->attributes;
+                //$return['id'] = $model->getPrimaryKey();
+                $res['data'] = $return;
+            }
+        }
+        else
+        {
+            $res['status'] = 'error';
+            $res['data'] = 'Неправильный код';
+        }
+
+        echo CJSON::encode($res);
+        //echo "Попал";
+    }
+
 
 }

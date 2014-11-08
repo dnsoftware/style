@@ -8,6 +8,79 @@ $this->breadcrumbs=array(
 
 ?>
 
+<script language="javascript">
+
+function escapeHtml(text) {
+    var map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+function hideMarkerEdit()
+{
+    $('#markeredit').hide();
+    $('#bg_layer').hide();
+
+    if(typeof $('#Looktags_id').val()=='undefined' || $('#Looktags_id').val() == '' || $('#Looktags_id').val() == 0)
+    {
+        //alert($('#markeredit').data('lookmarker_kod'));
+        markers[$('#markeredit').data('lookmarker_kod')].remove();
+    }
+
+}
+
+function clearMarkeredit()
+{
+    $('#markeredit input[dbfield=id]').val('');
+    $('#markeredit input[dbfield=name]').val('');
+}
+
+
+function markerDataProvider(res_str)
+{
+    res = $.parseJSON(res_str);
+    if (res["status"] == "error")
+    {
+        $("#markeredit_error").html("");
+        for( index in res["data"] ) {
+            $("#markeredit_error").append("<div>"+res["data"][index]+"</div>");
+        }
+    }
+
+    if (res["status"] == "ok")
+    {
+        markers[$('#markeredit').data('lookmarker_kod')].data('str_data', res_str);
+
+        $('#markeredit_form input[type=text]').each( function (number, element) {
+                dbfield = element.getAttribute('dbfield');
+                if (typeof res["data"][dbfield] !='undefined')
+                {
+                    element.value = res["data"][dbfield];
+                    if (dbfield=='id')
+                    {
+                        markers[$('#markeredit').data('lookmarker_kod')].data('db_id', res["data"][dbfield]);
+                    }
+                    //console.log(res["data"][dbfield]);
+                }
+            }
+
+        );
+
+        //for( index in res["data"] ) {
+            //console.log(index);
+            //escapeHtml(res["data"][index]);
+        //}
+
+    }
+
+}
+</script>
 
 <div style="float: left;">
 <?
@@ -40,23 +113,34 @@ $this->widget('LooksetManager', array(
 
         <div id="markeredit_error"></div>
 
-        <div class="form">
+        <div id="markeredit_form" class="form">
             <?php
             echo CHtml::beginForm();
             ?>
 
             <div class="row">
                 <?php echo CHtml::activeLabel($tagmodel,'id'); ?>
-                <?php echo CHtml::activeTextField($tagmodel,'id'); ?>
+                <?php echo CHtml::activeTextField($tagmodel,'id', array('dbfield'=>'id')); ?>
             </div>
 
             <div class="row">
-                <input id="lookphotos_id" type="text" name="Looktags[p_id]" value="">
+                p_id<br>
+                <input id="lookphotos_id" dbfield="p_id" type="text" name="Looktags[p_id]" value="">
+            </div>
+
+            <div class="row">
+                <?php echo CHtml::activeLabel($tagmodel,'x_koord'); ?>
+                <?php echo CHtml::activeTextField($tagmodel,'x_koord', array('id'=>'x_koord', 'dbfield'=>'x_koord')); ?>
+            </div>
+
+            <div class="row">
+                <?php echo CHtml::activeLabel($tagmodel,'y_koord'); ?>
+                <?php echo CHtml::activeTextField($tagmodel,'y_koord', array('id'=>'y_koord', 'dbfield'=>'y_koord')); ?>
             </div>
 
             <div class="row">
                 <?php echo CHtml::activeLabel($tagmodel,'name'); ?>
-                <?php echo CHtml::activeTextField($tagmodel,'name'); ?>
+                <?php echo CHtml::activeTextField($tagmodel,'name', array('dbfield'=>'name')); ?>
             </div>
             <?
             // Второй параметр пуст, значит отсылаем данные на тот же URL.
@@ -64,18 +148,10 @@ $this->widget('LooksetManager', array(
             // ознакомиться в документации jQuery.
             echo CHtml::ajaxSubmitButton('Обработать', $this->createUrl('/userlookset/lookset/savetag'), array(
                     'type' => 'POST',
-                    'dataType' => 'json',
 
                     'success' => 'function(res)
                                   {
-                                  console.log(res);
-                                      if (res["status"] == "error")
-                                      {
-                                            for( index in res["data"] ) {
-                                                $("#markeredit_error").append("<div>"+res["data"][index]+"</div>");
-                                            };
-
-                                      }
+                                      markerDataProvider(res);
                                   }',
                     'error' => 'function(text)
                                   {

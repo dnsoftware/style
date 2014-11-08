@@ -8,8 +8,6 @@
  */
 class Looktags extends CActiveRecord
 {
-    public $id=0;
-
 	/**
 	 * @return string the associated database table name
 	 */
@@ -26,10 +24,8 @@ class Looktags extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-            array('p_id, name', 'required'),
+            array('p_id, name, x_koord, y_koord', 'required'),
 
-			// @todo Please remove those attributes that should not be searched.
-			array('id, p_id, name, url, x_koord, y_koord, ct_id', 'safe', 'on'=>'search'),
 		);
 	}
 
