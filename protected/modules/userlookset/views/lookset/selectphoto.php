@@ -72,6 +72,8 @@
     var markerTemplate = '<span class="lookmarker"></span>';
     var marker_counter = 0;
     var markers = {};
+    var editimage_width = $('.editimage').width();
+    var editimage_height = $('.editimage').height();
 
     $('#bg_layer').offset().left = $('.editimage').offset().left;
     $('#bg_layer').offset().top = $('.editimage').offset().top;
@@ -91,24 +93,47 @@
 
         clearMarkeredit();
 
+
+        lookmarkConstructor(xmarker, ymarker, e);
+
+
+
+    });
+
+
+    // если e=null - значит идет загрузка данных из базы, иначе - создание маркера по клику
+    function lookmarkConstructor(xmarker, ymarker, e=null, str_data=null)
+    {
+        xmarker = Math.round(xmarker);
+        ymarker = Math.round(ymarker);
+
         marker_counter++;
 
         var lookmarker = $(markerTemplate);
 
         markers[marker_counter] = lookmarker;
         lookmarker.data('kod', marker_counter);
-
-        $('#markeredit').data('lookmarker_kod', marker_counter);
-
         lookmarker.css("left", xmarker);
         lookmarker.css("top", ymarker);
 
-        $('#markeredit').css('display', 'block');
-        //lookmarker.css('z-index', $('#bg_layer').css('z-index')+1);
-        $('#bg_layer').show();
+        if (e != null)
+        {
+            $('#markeredit').data('lookmarker_kod', marker_counter);
+            $('#markeredit').show();
+            $('#bg_layer').show();
+            $('#markeredit').css("left", e.pageX+14);
+            $('#markeredit').css("top", e.pageY-14);
+        }
 
-        $('#markeredit').css("left", e.pageX+14);
-        $('#markeredit').css("top", e.pageY-14);
+        if (str_data != null)
+        {
+            lookmarker.data('str_data', str_data);
+            res = $.parseJSON(str_data);
+            if (res["status"] == "ok")
+            {
+                lookmarker.data('db_id', res["data"]['id']);
+            }
+        }
 
         lookmarker.draggable({
             drag:function(event, ui){
@@ -117,6 +142,7 @@
             stop:function(event, ui){
                 setMarkereditKoords();
 
+                $('#markeredit').data('lookmarker_kod', lookmarker.data('kod'))
                 perc_koords = setPercentKoords();
                 changeKoords();
             },
@@ -138,6 +164,7 @@
                     url: '/index.php?r=userlookset/lookset/savetagkoords',
                     data: 'id='+lookmarker.data('db_id')+'&x_koord='+perc_koords['x']+'&y_koord='+perc_koords['y'],
                     success: function(res){
+                        //console.log(res);
                         markerDataProvider(res);
                     }
                 })
@@ -147,8 +174,8 @@
         function setPercentKoords()
         {
             var koords = [];
-            koords['x'] = (lookmarker.offset().left - $('.editimage').offset().left)/$('.editimage').width();
-            koords['y'] = (lookmarker.offset().top - $('.editimage').offset().top)/$('.editimage').height();
+            koords['x'] = (lookmarker.offset().left - $('.editimage').offset().left)/editimage_width;
+            koords['y'] = (lookmarker.offset().top - $('.editimage').offset().top)/editimage_height;
             $('#x_koord').val(koords['x']);
             $('#y_koord').val(koords['y']);
 
@@ -158,21 +185,26 @@
         lookmarker.on('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            //lookmarker.css('z-index', $('#bg_layer').css('z-index')+1);
+
             $('#markeredit').css("left", e.pageX+14);
             $('#markeredit').css("top", e.pageY-14);
-
             $('#markeredit').data('lookmarker_kod', lookmarker.data('kod'));
             markerDataProvider(lookmarker.data('str_data'));
-//            setPercentKoords();
+            //            setPercentKoords();
             $('#markeredit, #bg_layer').show();
         });
 
         $('.editimage').append(lookmarker);
         setPercentKoords();
+    }
 
-
-    });
-
+    <?
+    foreach ($lookmarkers as $key => $val)
+    {
+    ?>
+        lookmarkConstructor(editimage_width*<?= $val->x_koord;?>, editimage_height*<?= $val->y_koord;?>, null, '<?= $val->str_data;?>');
+    <?
+    }
+    ?>
 
 </script>

@@ -8,6 +8,8 @@
  */
 class Looktags extends CActiveRecord
 {
+    public $str_data = '';
+
 	/**
 	 * @return string the associated database table name
 	 */

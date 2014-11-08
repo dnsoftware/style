@@ -29,8 +29,10 @@ function hideMarkerEdit()
 
     if(typeof $('#Looktags_id').val()=='undefined' || $('#Looktags_id').val() == '' || $('#Looktags_id').val() == 0)
     {
-        //alert($('#markeredit').data('lookmarker_kod'));
-        markers[$('#markeredit').data('lookmarker_kod')].remove();
+        if (typeof $('#markeredit').data('lookmarker_kod') != 'undefined')
+        {
+            markers[$('#markeredit').data('lookmarker_kod')].remove();
+        }
     }
 
 }

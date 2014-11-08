@@ -99,9 +99,19 @@ class LooksetController extends CController
         if ($photo !== null){
             $gallery = Lookset::model()->findByPk($photo->gallery_id);
 
-            $params['imgurl'] = '/'.$photo->galleryDir.'/'.$id.'big'.'.'.$photo->galleryExt;
+            $lookmarkers = Looktags::model()->findAllByAttributes(array('p_id'=>$id));
 
-            $this->renderPartial('selectphoto', array('model'=>$photo, 'params'=>$params));
+            foreach ($lookmarkers as $lkey => $lval)
+            {
+                $res = array();
+                $res['status'] = 'ok';
+                $res['data'] = $lval->attributes;
+                $lookmarkers[$lkey]->str_data = CJSON::encode($res);
+            }
+
+
+            $params['imgurl'] = '/'.$photo->galleryDir.'/'.$id.'big'.'.'.$photo->galleryExt;
+            $this->renderPartial('selectphoto', array('model'=>$photo, 'params'=>$params, 'lookmarkers'=>$lookmarkers));
 
         }
         else throw new CHttpException(400, 'Photo, not found');
