@@ -92,15 +92,18 @@ function clearMarkeredit()
 {
     $('#markeredit input[dbfield=id]').val('');
     $('#markeredit input[dbfield=name]').val('');
+    $('#markeredit').find('select[dbfield=ct_id]').val('');
 }
 
 
 function markerDataProvider(res_str)
 {
     res = $.parseJSON(res_str);
+
+    $("#markeredit_error").html("");
+
     if (res["status"] == "error")
     {
-        $("#markeredit_error").html("");
         for( index in res["data"] ) {
             $("#markeredit_error").append("<div>"+res["data"][index]+"</div>");
         }
@@ -140,7 +143,7 @@ function markerDataProvider(res_str)
 }
 </script>
 
-<div style="float: left;">
+<div style="margin-left: 11px; margin-bottom: 5px;">
 <?
 $gallery = new Lookset();
 $gallery = $gallery->findByPk(3);
@@ -156,13 +159,11 @@ $this->widget('LooksetManager', array(
 ?>
 </div>
 
-<div style="float: left; width: 720px; border: #ddd solid 0px;">
-
+<div style="width: 720px; border: #ddd solid 0px;">
     <div id="lookeditor" style="margin-left: 15px; margin-top: 5px;">
 
     </div>
 </div>
-
 
 
 <div id="markeredit" >
@@ -200,7 +201,7 @@ $this->widget('LooksetManager', array(
                 <?php echo CHtml::activeLabel($tagmodel,'name'); ?>
                 <?php echo CHtml::activeTextField($tagmodel,'name', array('dbfield'=>'name')); ?>
             </div>
-
+<!--
             <div class="row">
                 <?php //echo CHtml::activeLabel($clothtype_model,'ct_id'); ?>
                 <?php echo CHtml::activeDropDownList($tagmodel,'ct_id',
@@ -212,6 +213,17 @@ $this->widget('LooksetManager', array(
                                 )
                          )); ?>
             </div>
+-->
+            <div class="row">
+                <?php echo "ct_id"; ?>
+                <?php $this->widget('zii.widgets.jui.CJuiAutoComplete', $autocompleteConfig); ?>
+                <input id="ct2_id" dbfield="ct_id" type="text" name="Looktags[ct_id]" value="">
+            </div>
+
+            <div class="row">
+
+            </div>
+
             <?
             // Второй параметр пуст, значит отсылаем данные на тот же URL.
             // Третий параметр задаёт опции запроса. Подробнее с ними можно

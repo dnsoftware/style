@@ -76,6 +76,7 @@
             $bg_layer.show();
             $markeredit.css("left", e.pageX+14);
             $markeredit.css("top", e.pageY-14);
+
         }
 
         if (str_data != null)

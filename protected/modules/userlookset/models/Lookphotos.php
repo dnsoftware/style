@@ -23,7 +23,7 @@ class Lookphotos extends CActiveRecord
     /** @var string directory in web root for galleries */
     public $galleryDir = 'gallery';
 
-    public static $markedImageWidth = 450;
+    public static $markedImageWidth = 550;
 
 
     /**

@@ -1,7 +1,7 @@
 /* Photo Gallery */
 .GalleryEditor {
     position: relative;
-    border: 1px solid #DDD;
+    border: 0px solid #DDD;
 
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
@@ -11,7 +11,7 @@
 
     /*box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075);*/
 
-    width: 190px;
+    width: 790px;
 }
 
 .GalleryEditor div.gform {
@@ -30,12 +30,13 @@
     cursor: pointer;
     background-color: #fff;
     margin: 4px;
-    /*height: 178px;*/
-    width: 170px;
+    height: 88px;
+    width: 130px;
+    text-align: center;
     display: block;
     padding: 4px;
     line-height: 1;
-    border-bottom: 1px solid #DDD;
+    border: 1px solid #DDD;
     /*-webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -160,14 +161,13 @@
 .GalleryEditor .image-preview {
     /*height: 88px;*/
     overflow: hidden;
-    float: left;
 }
 
 .GalleryEditor .image-preview img {
     /*margin-top: -20px;
     margin-bottom: -20px;
     */
-    width: 90px;
+    height: 60px;
 }
 
 /* item selection */
@@ -270,6 +270,13 @@
 .GalleryEditor .setmainPhoto
 {
     position: absolute;
+    left: 40px;
+    bottom:5px;
+}
+
+.GalleryEditor .deletePhoto
+{
+    position: absolute;
     right: 5px;
-    bottom:10px;
+    top:3px;
 }

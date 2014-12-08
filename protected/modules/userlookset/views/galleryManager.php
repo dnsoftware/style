@@ -8,10 +8,10 @@
 ?>
 <?php echo CHtml::openTag('div', $this->htmlOptions); ?>
     <!-- Gallery Toolbar -->
-    <div class="btn-toolbar gform">
-        <span class="btn btn-success fileinput-button">
+    <div class="btn-toolbar gform" sstyle="float: left;">
+        <span class="btn btn-success fileinput-button" sstyle="margin-top: 25px; height: 30px; padding-top: 10px;">
             <i class="icon-plus icon-white"></i>
-            <?php echo Yii::t('galleryManager.main', 'Add…');?>
+            <?php echo Yii::t('galleryManager.main', 'Добавить фотографию…');?>
             <input type="file" name="image" class="afile" accept="image/*" multiple="multiple"/>
         </span>
 
@@ -24,7 +24,7 @@
             <span class="btn disabled remove_selected"><i class="icon-remove"></i> <?php /*echo Yii::t('galleryManager.main', 'Remove');*/?></span>
         </div>
     </div>
-    <hr/>
+    <!--<hr/>-->
     <!-- Gallery Photos -->
     <div class="sorter">
         <div class="images"></div>

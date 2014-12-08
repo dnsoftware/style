@@ -33,7 +33,8 @@ class LooksetController extends CController
                 'users'=>array('*'),
             ),
             array('allow',  // allow all users to perform 'index' and 'view' actions
-                'actions'=>array('ajaxupload', 'delete', 'setmain', 'order', 'savedata', 'savetag', 'savetagkoords'),
+                'actions'=>array('ajaxupload', 'delete', 'setmain', 'order', 'savedata', 'savetag',
+                                    'savetagkoords', 'clothtypeautocomp'),
                 'users'=>array('@'),
             ),
             /*
@@ -270,6 +271,27 @@ class LooksetController extends CController
 
         echo CJSON::encode($res);
         //echo "Попал";
+    }
+
+    public function actionClothtypeautocomp()
+    {
+        $term = Yii::app()->getRequest()->getParam('term');
+
+        if(Yii::app()->request->isAjaxRequest && $term) {
+            $criteria = new CDbCriteria;
+            // формируем критерий поиска
+            $criteria->addSearchCondition('name', $term);
+            $clothtype = Clothtype::model()->findAll($criteria);
+            // обрабатываем результат
+            $result = array();
+            foreach($clothtype as $type) {
+                $lable = $type['name'];
+                $result[] = array('id'=>$type['id'], 'label'=>$lable, 'value'=>$type['name']);
+            }
+            echo CJSON::encode($result);
+            Yii::app()->end();
+        }
+
     }
 
 
